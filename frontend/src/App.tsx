@@ -11,6 +11,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import Login from "@/pages/auth/Login"
 import Signup from "@/pages/auth/Signup"
 import ForgotPassword from "@/pages/auth/ForgotPassword"
+import PublicTrip from "@/pages/app/PublicTrip"
 
 import Dashboard from "@/pages/app/Dashboard"
 import MyTrips from "@/pages/app/MyTrips"
@@ -26,6 +27,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/share/:slug" element={<PublicTrip />} />
 
         {/* Protected Application Routes */}
         <Route element={<ProtectedRoute />}>

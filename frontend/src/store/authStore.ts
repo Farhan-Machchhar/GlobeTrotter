@@ -67,22 +67,26 @@ export const useAuthStore = create<AuthState>()(
           });
           return true;
         } catch (err: any) {
-          console.warn("Backend auth failed or unreachable, using fallback login:", err);
-          // Fallback demo user for offline / hackathon testing
-          const fallbackUser: User = {
-            id: "demo-user-id",
-            email,
-            name: email.split("@")[0] || "Explorer",
-          };
-          const fallbackToken = "demo-jwt-token-globetrotter";
-          localStorage.setItem("token", fallbackToken);
-          set({
-            user: fallbackUser,
-            token: fallbackToken,
-            isAuthenticated: true,
-            isLoading: false,
-          });
-          return true;
+          if (import.meta.env.VITE_USE_MOCK_API === "true") {
+            console.warn("Using mock auth fallback");
+            const fallbackUser: User = {
+              id: "demo-user-id",
+              email,
+              name: email.split("@")[0] || "Explorer",
+            };
+            const fallbackToken = "demo-jwt-token-globetrotter";
+            localStorage.setItem("token", fallbackToken);
+            set({
+              user: fallbackUser,
+              token: fallbackToken,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+            return true;
+          }
+          const msg = err.response?.data?.detail || err.message || "Login failed.";
+          set({ error: msg, isLoading: false });
+          return false;
         }
       },
 
@@ -121,21 +125,26 @@ export const useAuthStore = create<AuthState>()(
           });
           return true;
         } catch (err: any) {
-          console.warn("Backend signup failed or unreachable, using fallback signup:", err);
-          const fallbackUser: User = {
-            id: `user-${Date.now()}`,
-            email,
-            name,
-          };
-          const fallbackToken = "demo-jwt-token-globetrotter";
-          localStorage.setItem("token", fallbackToken);
-          set({
-            user: fallbackUser,
-            token: fallbackToken,
-            isAuthenticated: true,
-            isLoading: false,
-          });
-          return true;
+          if (import.meta.env.VITE_USE_MOCK_API === "true") {
+            console.warn("Using mock signup fallback");
+            const fallbackUser: User = {
+              id: `user-${Date.now()}`,
+              email,
+              name,
+            };
+            const fallbackToken = "demo-jwt-token-globetrotter";
+            localStorage.setItem("token", fallbackToken);
+            set({
+              user: fallbackUser,
+              token: fallbackToken,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+            return true;
+          }
+          const msg = err.response?.data?.detail || err.message || "Signup failed.";
+          set({ error: msg, isLoading: false });
+          return false;
         }
       },
 

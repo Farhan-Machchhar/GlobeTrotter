@@ -113,14 +113,12 @@ const MOCK_TRIP: Trip = {
   ]
 };
 
+const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API === 'true';
+
 export const apiService = {
   // AI Trip Planner
   async planTrip(req: PlanTripRequest): Promise<AITripPlanResponse> {
-    try {
-      const res = await apiClient.post<AITripPlanResponse>('/ai/plan-trip', req);
-      return res.data;
-    } catch {
-      console.warn("Backend unavailable, using fallback AI generator output.");
+    if (USE_MOCK_API) {
       return {
         title: `Magical ${req.duration_days || 6}-Day ${req.destination || 'Japan'} Expedition`,
         description: `Generated AI itinerary for: ${req.prompt}`,
@@ -155,52 +153,37 @@ export const apiService = {
         }
       };
     }
+    const res = await apiClient.post<AITripPlanResponse>('/ai/plan-trip', req);
+    return res.data;
   },
 
   async planAndSaveTrip(req: PlanTripRequest): Promise<Trip> {
-    try {
-      const res = await apiClient.post<Trip>('/ai/plan-trip/save', req);
-      return res.data;
-    } catch {
-      console.warn("Backend unavailable, using saved mock trip.");
+    if (USE_MOCK_API) {
       return MOCK_TRIP;
     }
+    const res = await apiClient.post<Trip>('/ai/plan-trip/save', req);
+    return res.data;
   },
 
   // Trips CRUD
   async getTrips(): Promise<Trip[]> {
-    try {
-      const res = await apiClient.get<Trip[]>('/trips');
-      return res.data;
-    } catch {
+    if (USE_MOCK_API) {
       return [MOCK_TRIP];
     }
+    const res = await apiClient.get<Trip[]>('/trips');
+    return res.data;
   },
 
   async getTripById(id: string): Promise<Trip> {
-    try {
-      const res = await apiClient.get<Trip>(`/trips/${id}`);
-      return res.data;
-    } catch {
+    if (USE_MOCK_API) {
       return { ...MOCK_TRIP, id };
     }
+    const res = await apiClient.get<Trip>(`/trips/${id}`);
+    return res.data;
   },
 
   async createTrip(payload: CreateTripPayload | Partial<Trip>): Promise<Trip> {
-    try {
-      const body = {
-        name: payload.name,
-        destination: payload.destination,
-        start_date: payload.start_date || payload.startDate,
-        end_date: payload.end_date || payload.endDate,
-        duration_days: payload.duration_days || 5,
-        budget: payload.budget || 0,
-        currency: payload.currency || "USD",
-        is_public: payload.is_public ?? false,
-      };
-      const res = await apiClient.post<Trip>('/trips', body);
-      return res.data;
-    } catch {
+    if (USE_MOCK_API) {
       return {
         ...MOCK_TRIP,
         id: `trip-${Date.now()}`,
@@ -209,31 +192,39 @@ export const apiService = {
         budget: payload.budget || 50000,
       };
     }
+    const body = {
+      name: payload.name,
+      destination: payload.destination,
+      start_date: payload.start_date || payload.startDate,
+      end_date: payload.end_date || payload.endDate,
+      duration_days: payload.duration_days || 5,
+      budget: payload.budget || 0,
+      currency: payload.currency || "USD",
+      is_public: payload.is_public ?? false,
+    };
+    const res = await apiClient.post<Trip>('/trips', body);
+    return res.data;
   },
 
   async updateTrip(id: string, payload: UpdateTripPayload | Partial<Trip>): Promise<Trip> {
-    try {
-      const res = await apiClient.patch<Trip>(`/trips/${id}`, payload);
-      return res.data;
-    } catch {
+    if (USE_MOCK_API) {
       return { ...MOCK_TRIP, id, name: payload.name || MOCK_TRIP.name };
     }
+    const res = await apiClient.patch<Trip>(`/trips/${id}`, payload);
+    return res.data;
   },
 
   async deleteTrip(id: string): Promise<void> {
-    try {
-      await apiClient.delete(`/trips/${id}`);
-    } catch {
-      console.warn(`Local deletion fallback for trip ${id}`);
+    if (USE_MOCK_API) {
+      console.warn(`Mock deletion for trip ${id}`);
+      return;
     }
+    await apiClient.delete(`/trips/${id}`);
   },
 
   // Cities Search
   async searchCities(query: string): Promise<CitySearchResult[]> {
-    try {
-      const res = await apiClient.get<{ cities: CitySearchResult[] }>('/cities/search', { params: { q: query } });
-      return res.data.cities || [];
-    } catch {
+    if (USE_MOCK_API) {
       return [
         { id: "tokyo-jp", name: "Tokyo", country: "Japan", latitude: 35.6762, longitude: 139.6503, popular_places_count: 120, image_url: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=800" },
         { id: "kyoto-jp", name: "Kyoto", country: "Japan", latitude: 35.0116, longitude: 135.7681, popular_places_count: 85, image_url: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800" },
@@ -241,14 +232,13 @@ export const apiService = {
         { id: "paris-fr", name: "Paris", country: "France", latitude: 48.8566, longitude: 2.3522, popular_places_count: 150, image_url: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800" }
       ];
     }
+    const res = await apiClient.get<{ cities: CitySearchResult[] }>('/cities/search', { params: { q: query } });
+    return res.data.cities || [];
   },
 
   // Budget Breakdown
   async getTripBudget(tripId: string): Promise<BudgetSummary> {
-    try {
-      const res = await apiClient.get<BudgetSummary>(`/budget/${tripId}`);
-      return res.data;
-    } catch {
+    if (USE_MOCK_API) {
       return {
         trip_id: tripId,
         total_budget: 60000,
@@ -262,15 +252,16 @@ export const apiService = {
         ]
       };
     }
+    const res = await apiClient.get<BudgetSummary>(`/budget/${tripId}`);
+    return res.data;
   },
 
   // Share Public Link
   async getSharedTrip(slug: string): Promise<Trip> {
-    try {
-      const res = await apiClient.get<Trip>(`/sharing/${slug}`);
-      return res.data;
-    } catch {
+    if (USE_MOCK_API) {
       return { ...MOCK_TRIP, share_slug: slug };
     }
+    const res = await apiClient.get<Trip>(`/sharing/${slug}`);
+    return res.data;
   }
 };

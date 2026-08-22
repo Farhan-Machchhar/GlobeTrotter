@@ -206,3 +206,18 @@ async def unsave_city(
     )
     await db.commit()
     return None
+
+
+@router.get("/saved/me", response_model=List[CitySearchResult])
+async def get_my_saved_cities(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Return all favourite cities saved by the current user."""
+    result = await db.execute(
+        select(SavedDestination).where(SavedDestination.user_id == current_user.id)
+    )
+    saved_entries = result.scalars().all()
+    city_ids = [s.city_id for s in saved_entries]
+    return [_CITY_MAP[cid] for cid in city_ids if cid in _CITY_MAP]
+

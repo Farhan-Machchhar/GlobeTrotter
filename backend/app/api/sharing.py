@@ -15,7 +15,7 @@ from sqlalchemy.orm import selectinload
 from app.core.dependencies import get_current_user
 from app.database.session import get_db
 from app.models import Share, Stop, Trip, User
-from app.schemas.trip import PublicTripResponse, ShareResponse, StopResponse
+from app.schemas.trip import PublicTripResponse, ShareResponse, StopResponse, TripResponse
 
 logger = logging.getLogger("globetrotter.sharing")
 router = APIRouter(prefix="/sharing", tags=["Sharing"])
@@ -173,3 +173,93 @@ async def revoke_share_link(
 
     logger.info(f"Share link revoked for trip {trip_id}")
     return None
+
+
+@router.post("/{slug}/copy", response_model=TripResponse, status_code=status.HTTP_201_CREATED)
+async def copy_shared_trip(
+    slug: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Duplicate a publicly shared trip into the authenticated user's account ("Copy Trip").
+    """
+    # Find trip by share slug
+    share_res = await db.execute(select(Share).where(Share.slug == slug, Share.is_active == True))
+    share = share_res.scalars().first()
+
+    if share:
+        t_res = await db.execute(
+            select(Trip).options(selectinload(Trip.stops).selectinload(Stop.activities)).where(Trip.id == share.trip_id)
+        )
+    else:
+        t_res = await db.execute(
+            select(Trip).options(selectinload(Trip.stops).selectinload(Stop.activities)).where(Trip.share_slug == slug)
+        )
+
+    orig_trip = t_res.scalars().first()
+    if not orig_trip:
+        raise HTTPException(status_code=404, detail="Shared trip not found.")
+
+    new_slug = str(uuid.uuid4())[:8]
+    new_trip = Trip(
+        user_id=current_user.id,
+        name=f"Copy of {orig_trip.name or orig_trip.title or 'Shared Trip'}",
+        title=f"Copy of {orig_trip.name or orig_trip.title or 'Shared Trip'}",
+        description=orig_trip.description,
+        destination=orig_trip.destination,
+        start_date=orig_trip.start_date,
+        end_date=orig_trip.end_date,
+        duration_days=orig_trip.duration_days,
+        budget=orig_trip.budget,
+        total_budget=orig_trip.total_budget,
+        currency=orig_trip.currency,
+        cover_photo_url=orig_trip.cover_photo_url,
+        cover_image_url=orig_trip.cover_image_url,
+        status="planning",
+        is_public=False,
+        share_slug=new_slug
+    )
+    db.add(new_trip)
+    await db.flush()
+
+    from app.models import Activity
+    for s in orig_trip.stops:
+        new_stop = Stop(
+            trip_id=new_trip.id,
+            city_name=s.city_name,
+            country=s.country,
+            latitude=s.latitude,
+            longitude=s.longitude,
+            arrival_date=s.arrival_date,
+            departure_date=s.departure_date,
+            notes=s.notes,
+            order_index=s.order_index
+        )
+        db.add(new_stop)
+        await db.flush()
+
+        for a in s.activities:
+            new_act = Activity(
+                stop_id=new_stop.id,
+                title=a.title,
+                name=a.name,
+                description=a.description,
+                category=a.category,
+                activity_type=a.activity_type,
+                cost=a.cost,
+                duration_mins=a.duration_mins,
+                duration_minutes=a.duration_minutes,
+                day_number=a.day_number,
+                order_index=a.order_index,
+                latitude=a.latitude,
+                longitude=a.longitude,
+                image_url=a.image_url
+            )
+            db.add(new_act)
+
+    await db.commit()
+    from app.api.trips import _load_trip_query
+    result = await db.execute(_load_trip_query(new_trip.id))
+    return result.scalars().first()
+
