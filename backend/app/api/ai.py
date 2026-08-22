@@ -32,12 +32,15 @@ async def generate_and_save_ai_trip(req: PlanTripRequest, db: AsyncSession = Dep
     share_slug = str(uuid.uuid4())[:8]
 
     trip = Trip(
+        name=ai_plan.title,
         title=ai_plan.title,
         description=ai_plan.description,
         destination=ai_plan.destination,
         duration_days=ai_plan.total_days,
+        budget=ai_plan.estimated_total_cost,
         total_budget=ai_plan.estimated_total_cost,
         currency=ai_plan.currency,
+        cover_photo_url=ai_plan.cover_image_url or "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1200",
         cover_image_url=ai_plan.cover_image_url or "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1200",
         is_public=True,
         share_slug=share_slug
@@ -62,10 +65,13 @@ async def generate_and_save_ai_trip(req: PlanTripRequest, db: AsyncSession = Dep
             act = Activity(
                 stop_id=stop.id,
                 title=act_item.title,
+                name=act_item.title,
                 description=act_item.description,
                 category=act_item.category,
+                activity_type=act_item.category,
                 cost=act_item.cost,
                 duration_mins=act_item.duration_mins,
+                duration_minutes=act_item.duration_mins,
                 day_number=act_item.day_number,
                 order_index=a_idx,
                 latitude=act_item.latitude,
@@ -95,5 +101,6 @@ async def generate_and_save_ai_trip(req: PlanTripRequest, db: AsyncSession = Dep
                 db.add(exp)
 
     await db.commit()
-    await db.refresh(trip)
-    return trip
+    from app.api.trips import _load_trip_query
+    result = await db.execute(_load_trip_query(trip.id))
+    return result.scalars().first()

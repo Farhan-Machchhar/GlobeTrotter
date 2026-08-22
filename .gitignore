@@ -10,6 +10,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.db
+.pytest_cache/
 .Python
 build/
 develop-eggs/
