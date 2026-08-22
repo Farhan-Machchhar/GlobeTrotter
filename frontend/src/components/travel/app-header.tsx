@@ -2,7 +2,8 @@ import {
   Menu,
   Plane,
 } from "lucide-react"
-
+import { NavLink, Link } from "react-router-dom"
+import { useAuthStore } from "@/store/authStore"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -14,7 +15,7 @@ const navigation = [
   },
   {
     label: "My Trips",
-    href: "/trips",
+    href: "/my-trips",
   },
   {
     label: "Discover",
@@ -23,16 +24,15 @@ const navigation = [
 ]
 
 interface AppHeaderProps {
-  currentPath?: string
   onMenuClick?: () => void
   className?: string
 }
 
 function AppHeader({
-  currentPath = "/dashboard",
   onMenuClick,
   className,
 }: AppHeaderProps) {
+  const logout = useAuthStore((state) => state.logout)
   return (
     <header
       className={cn(
@@ -47,8 +47,8 @@ function AppHeader({
 
         {/* Brand */}
 
-        <a
-          href="/dashboard"
+        <Link
+          to="/dashboard"
           className="group flex items-center gap-2.5"
         >
           <span
@@ -67,7 +67,7 @@ function AppHeader({
           <span className="font-heading text-base font-semibold tracking-tight">
             GlobeTrotter
           </span>
-        </a>
+        </Link>
 
 
         {/* Desktop Navigation */}
@@ -76,35 +76,32 @@ function AppHeader({
           aria-label="Main navigation"
           className="hidden items-center gap-1 md:flex"
         >
-          {navigation.map((item) => {
-            const isActive = currentPath === item.href
-
-            return (
-              <a
-                key={item.href}
-                href={item.href}
-                aria-current={isActive ? "page" : undefined}
-                className={cn(
+          {navigation.map((item) => (
+            <NavLink
+              key={item.href}
+              to={item.href}
+              className={({ isActive }) =>
+                cn(
                   "rounded-lg px-3 py-2",
                   "text-sm font-medium",
                   "transition-colors duration-200",
 
                   isActive
                     ? [
-                        "bg-muted",
-                        "text-foreground",
-                      ].join(" ")
+                      "bg-muted",
+                      "text-foreground",
+                    ].join(" ")
                     : [
-                        "text-muted-foreground",
-                        "hover:bg-muted/60",
-                        "hover:text-foreground",
-                      ].join(" ")
-                )}
-              >
-                {item.label}
-              </a>
-            )
-          })}
+                      "text-muted-foreground",
+                      "hover:bg-muted/60",
+                      "hover:text-foreground",
+                    ].join(" ")
+                )
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
         </nav>
 
 
@@ -114,7 +111,8 @@ function AppHeader({
           <Button
             variant="ghost"
             size="icon"
-            aria-label="Open profile"
+            aria-label="Log out"
+            onClick={logout}
           >
             <Avatar size="sm">
               <AvatarFallback>

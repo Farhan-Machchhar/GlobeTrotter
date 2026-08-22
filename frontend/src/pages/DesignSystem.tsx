@@ -1,12 +1,23 @@
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage } from "@/components/ui/avatar"
-import { Search, Heart, MoreHorizontal, Plus, Settings, } from "lucide-react"
-import { AppHeader } from "@/components/layout/app-header"
+import { Search, Heart, MoreHorizontal, Plus, Settings, MapPin, } from "lucide-react"
+import { AppHeader } from "@/components/travel/app-header"
+import { SearchBar } from "@/components/travel/search-bar"
+import { TripCard } from "@/components/travel/trip-card"
+import { DestinationCard } from "@/components/travel/destination-card"
+import { ActivityCard } from "@/components/travel/activity-card"
+import { BudgetSummary } from "@/components/travel/budget-summary"
+import { EmptyState } from "@/components/travel/empty-state"
+import { UserMenu } from "@/components/travel/user-menu"
+import { SectionHeader } from "@/components/travel/section-header"
+import { TripSummaryHeader } from "@/components/travel/trip-summary-header"
 
 export default function DesignSystem() {
+    const [search, setSearch] = useState("")
     return (
         <main className="min-h-screen bg-background px-6 py-12 text-foreground">
             <div className="mx-auto max-w-6xl space-y-16">
@@ -29,6 +40,253 @@ export default function DesignSystem() {
                     </p>
                 </section>
 
+                {/* Trip Summary Header */}
+                <section className="space-y-8">
+
+                    <div>
+                        <h2 className="type-h2">
+                            Trip Summary Header
+                        </h2>
+
+                        <p className="mt-2 type-body text-muted-foreground">
+                            A visual summary for individual trip and itinerary pages.
+                        </p>
+                    </div>
+
+                    <div className="max-w-5xl">
+
+                        <TripSummaryHeader
+                            title="Japan Adventure"
+                            location="Tokyo · Kyoto · Osaka"
+                            date="12 Sep — 18 Sep 2026"
+                            status="upcoming"
+                            description="A seven-day journey through Japan combining vibrant city life, historic temples, and unforgettable local experiences."
+                            image="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1600&q=80"
+                        />
+
+                    </div>
+
+                </section>
+
+                {/* Section Header */}
+                <section className="space-y-8">
+
+                    <div>
+                        <h2 className="type-h2">
+                            Section Headers
+                        </h2>
+
+                        <p className="mt-2 type-body text-muted-foreground">
+                            Consistent headings for organizing travel content.
+                        </p>
+                    </div>
+
+                    <div className="max-w-4xl space-y-10">
+
+                        <SectionHeader
+                            title="Upcoming Trips"
+                            description="Your next adventures and planned journeys."
+                            actionLabel="View all"
+                        />
+
+                        <SectionHeader
+                            title="Explore Destinations"
+                            description="Find inspiration for your next adventure."
+                        />
+
+                    </div>
+
+                </section>
+
+                {/* User Menu */}
+                <section className="space-y-8">
+
+                    <div>
+                        <h2 className="type-h2">
+                            User Menu
+                        </h2>
+
+                        <p className="mt-2 type-body text-muted-foreground">
+                            Account actions presented in a compact travel-app menu.
+                        </p>
+                    </div>
+
+                    <UserMenu
+                        name="Kavya Pandya"
+                        email="kavya@example.com"
+                    />
+
+                </section>
+
+                {/* Empty State */}
+                <section className="space-y-8">
+
+                    <div>
+                        <h2 className="type-h2">
+                            Empty States
+                        </h2>
+
+                        <p className="mt-2 type-body text-muted-foreground">
+                            Friendly guidance when there is nothing to display yet.
+                        </p>
+                    </div>
+
+                    <div className="max-w-2xl">
+
+                        <EmptyState
+                            icon={<MapPin className="size-6" />}
+                            title="No trips yet"
+                            description="Start planning your next adventure and your trips will appear here."
+                            actionLabel="Create a Trip"
+                        />
+
+                    </div>
+
+                </section>
+
+                {/* Budget Summary */}
+                <section className="space-y-8">
+
+                    <div>
+                        <h2 className="type-h2">
+                            Budget Summary
+                        </h2>
+
+                        <p className="mt-2 type-body text-muted-foreground">
+                            A compact overview of planned and remaining trip expenses.
+                        </p>
+                    </div>
+
+                    <div className="max-w-md">
+
+                        <BudgetSummary
+                            total="58,400"
+                            spent="34,750"
+                            remaining="23,650"
+                            progress={59}
+                        />
+
+                    </div>
+
+                </section>
+
+                {/* Activity Cards */}
+                <section className="space-y-8">
+
+                    <div>
+                        <h2 className="type-h2">
+                            Activity Cards
+                        </h2>
+
+                        <p className="mt-2 type-body text-muted-foreground">
+                            Compact itinerary cards for activities and scheduled experiences.
+                        </p>
+                    </div>
+
+                    <div className="grid max-w-4xl gap-4 md:grid-cols-2">
+
+                        <ActivityCard
+                            title="Visit Fushimi Inari Shrine"
+                            location="Kyoto, Japan"
+                            time="09:00 AM"
+                            duration="2 hours"
+                            category="Culture"
+                            description="Explore the iconic torii gates and surrounding mountain paths."
+                        />
+
+                        <ActivityCard
+                            title="Sunset at Santorini"
+                            location="Oia, Greece"
+                            time="06:30 PM"
+                            duration="1.5 hours"
+                            category="Sightseeing"
+                            description="Enjoy the famous Aegean sunset from the cliffs of Oia."
+                        />
+
+                    </div>
+
+                </section>
+
+
+                {/* Destination Cards */}
+                <section className="space-y-8">
+
+                    <div>
+                        <h2 className="type-h2">
+                            Destination Cards
+                        </h2>
+
+                        <p className="mt-2 type-body text-muted-foreground">
+                            Visual destination discovery cards for travel inspiration.
+                        </p>
+                    </div>
+
+                    <div className="grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+                        <DestinationCard
+                            name="Kyoto"
+                            country="Japan"
+                            tag="Cultural"
+                            description="Ancient temples, peaceful gardens, and timeless Japanese traditions."
+                            image="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=900&q=80"
+                        />
+
+                        <DestinationCard
+                            name="Santorini"
+                            country="Greece"
+                            tag="Popular"
+                            description="Whitewashed villages, blue domes, and unforgettable Aegean sunsets."
+                            image="https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=900&q=80"
+                        />
+
+                        <DestinationCard
+                            name="Bali"
+                            country="Indonesia"
+                            tag="Relax"
+                            description="Tropical landscapes, vibrant culture, and beautiful island escapes."
+                            image="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=900&q=80"
+                        />
+
+                    </div>
+
+                </section>
+
+                {/* Trip Cards */}
+                <section className="space-y-8">
+
+                    <div>
+                        <h2 className="type-h2">
+                            Trip Cards
+                        </h2>
+
+                        <p className="mt-2 type-body text-muted-foreground">
+                            Reusable cards for upcoming, ongoing, and completed journeys.
+                        </p>
+                    </div>
+
+                    <div className="grid max-w-5xl gap-6 md:grid-cols-2">
+
+                        <TripCard
+                            title="Japan Adventure"
+                            location="Tokyo · Kyoto · Osaka"
+                            date="12 Sep — 18 Sep"
+                            destinations={3}
+                            status="upcoming"
+                            image="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80"
+                        />
+
+                        <TripCard
+                            title="Kerala Escape"
+                            location="Kochi · Munnar · Alleppey"
+                            date="04 Oct — 09 Oct"
+                            destinations={3}
+                            status="ongoing"
+                            image="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1200&q=80"
+                        />
+
+                    </div>
+
+                </section>
 
                 {/* Colors */}
                 <section className="space-y-6">
@@ -233,6 +491,62 @@ export default function DesignSystem() {
 
                 </section>
 
+                {/* Search Bar */}
+                <section className="space-y-8">
+                    <div className="w-full max-w-xl">
+
+                        <div>
+                            <h2 className="type-h2">
+                                Search Bar
+                            </h2>
+
+                            <p className="mt-2 type-body text-muted-foreground">
+                                A lightweight search field for discovering destinations and trips.
+                            </p>
+                        </div>
+
+                        <div className="max-w-xl space-y-3">
+
+                            <p className="type-label text-muted-foreground">
+                                DEFAULT
+                            </p>
+
+                            <SearchBar />
+
+                        </div>
+
+                        <div className="max-w-xl space-y-3">
+
+                            <p className="type-label text-muted-foreground">
+                                INTERACTIVE
+                            </p>
+
+                            <SearchBar
+                                value={search}
+                                onChange={(event) => setSearch(event.target.value)}
+                                onClear={() => setSearch("")}
+                            />
+
+                        </div>
+
+
+                        <div className="max-w-xl space-y-3">
+
+                            <p className="type-label text-muted-foreground">
+                                DISABLED
+                            </p>
+
+                            <SearchBar
+                                placeholder="Search is unavailable"
+                                disabled
+                            />
+
+                        </div>
+                    </div>
+
+                </section>
+
+                {/* App Header */}
                 <section className="space-y-8">
                     <div>
                         <h2 className="type-h2">
@@ -245,7 +559,7 @@ export default function DesignSystem() {
                     </div>
 
                     <div className="overflow-hidden rounded-xl border">
-                        <AppHeader currentPath="/dashboard" />
+                        <AppHeader />
                     </div>
                 </section>
 
