@@ -4,7 +4,9 @@ import type {
   BudgetSummary,
   PlanTripRequest,
   AITripPlanResponse,
-  CitySearchResult
+  CitySearchResult,
+  CreateTripPayload,
+  UpdateTripPayload,
 } from '../types/trip';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -14,26 +16,38 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000,
+  timeout: 20000,
 });
 
-// Demo fallback mock trip for instant development testing
+// Attach JWT token automatically if available
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Demo fallback mock trip for development testing when server offline
 const MOCK_TRIP: Trip = {
-  id: "demo-japan-trip",
-  title: "Magical 6-Day Japan Highlights",
-  description: "Immerse in Tokyo neon lights, Akihabara anime subculture, and Kyoto historical torii gate hikes.",
-  destination: "Japan (Tokyo & Kyoto)",
+  id: "japan-demo-2025",
+  name: "6-Day Japan Adventure",
+  title: "6-Day Japan Adventure",
+  description: "Epic journey through Tokyo anime culture, Kyoto temples, and natural wonders.",
+  destination: "Japan",
   duration_days: 6,
+  budget: 60000,
   total_budget: 60000,
   currency: "INR",
   cover_image_url: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1200",
+  cover_photo_url: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1200",
   is_public: true,
-  share_slug: "japan-demo-2026",
+  share_slug: "japan-demo-2025",
   created_at: new Date().toISOString(),
   stops: [
     {
       id: "stop-tokyo",
-      trip_id: "demo-japan-trip",
+      trip_id: "japan-demo-2025",
       city_name: "Tokyo",
       country: "Japan",
       latitude: 35.6762,
@@ -70,7 +84,7 @@ const MOCK_TRIP: Trip = {
     },
     {
       id: "stop-kyoto",
-      trip_id: "demo-japan-trip",
+      trip_id: "japan-demo-2025",
       city_name: "Kyoto",
       country: "Japan",
       latitude: 35.0116,
@@ -94,8 +108,8 @@ const MOCK_TRIP: Trip = {
     }
   ],
   expenses: [
-    { id: "exp-1", trip_id: "demo-japan-trip", title: "Hotel Tokyo", category: "accommodation", amount: 24000, currency: "INR" },
-    { id: "exp-2", trip_id: "demo-japan-trip", title: "Shinkansen Bullet Train", category: "transportation", amount: 14000, currency: "INR" }
+    { id: "exp-1", trip_id: "japan-demo-2025", title: "Hotel Tokyo", category: "accommodation", amount: 24000, currency: "INR" },
+    { id: "exp-2", trip_id: "japan-demo-2025", title: "Shinkansen Bullet Train", category: "transportation", amount: 14000, currency: "INR" }
   ]
 };
 
@@ -115,7 +129,7 @@ export const apiService = {
         estimated_total_cost: req.budget || 60000,
         currency: req.currency || "INR",
         cover_image_url: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1200",
-        stops: MOCK_TRIP.stops.map(s => ({
+        stops: MOCK_TRIP.stops!.map(s => ({
           city_name: s.city_name,
           country: s.country || "Japan",
           latitude: s.latitude || 35.6762,
@@ -172,24 +186,58 @@ export const apiService = {
     }
   },
 
-  async createTrip(tripData: Partial<Trip>): Promise<Trip> {
+  async createTrip(payload: CreateTripPayload | Partial<Trip>): Promise<Trip> {
     try {
-      const res = await apiClient.post<Trip>('/trips', tripData);
+      const body = {
+        name: payload.name,
+        destination: payload.destination,
+        start_date: payload.start_date || payload.startDate,
+        end_date: payload.end_date || payload.endDate,
+        duration_days: payload.duration_days || 5,
+        budget: payload.budget || 0,
+        currency: payload.currency || "USD",
+        is_public: payload.is_public ?? false,
+      };
+      const res = await apiClient.post<Trip>('/trips', body);
       return res.data;
     } catch {
-      return { ...MOCK_TRIP, ...tripData, id: `trip-${Date.now()}` };
+      return {
+        ...MOCK_TRIP,
+        id: `trip-${Date.now()}`,
+        name: payload.name || "New Trip",
+        destination: payload.destination || "Worldwide",
+        budget: payload.budget || 50000,
+      };
+    }
+  },
+
+  async updateTrip(id: string, payload: UpdateTripPayload | Partial<Trip>): Promise<Trip> {
+    try {
+      const res = await apiClient.patch<Trip>(`/trips/${id}`, payload);
+      return res.data;
+    } catch {
+      return { ...MOCK_TRIP, id, name: payload.name || MOCK_TRIP.name };
+    }
+  },
+
+  async deleteTrip(id: string): Promise<void> {
+    try {
+      await apiClient.delete(`/trips/${id}`);
+    } catch {
+      console.warn(`Local deletion fallback for trip ${id}`);
     }
   },
 
   // Cities Search
   async searchCities(query: string): Promise<CitySearchResult[]> {
     try {
-      const res = await apiClient.get<CitySearchResult[]>('/cities/search', { params: { q: query } });
-      return res.data;
+      const res = await apiClient.get<{ cities: CitySearchResult[] }>('/cities/search', { params: { q: query } });
+      return res.data.cities || [];
     } catch {
       return [
         { id: "tokyo-jp", name: "Tokyo", country: "Japan", latitude: 35.6762, longitude: 139.6503, popular_places_count: 120, image_url: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=800" },
         { id: "kyoto-jp", name: "Kyoto", country: "Japan", latitude: 35.0116, longitude: 135.7681, popular_places_count: 85, image_url: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800" },
+        { id: "barcelona-es", name: "Barcelona", country: "Spain", latitude: 41.3851, longitude: 2.1734, popular_places_count: 110, image_url: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?q=80&w=800" },
         { id: "paris-fr", name: "Paris", country: "France", latitude: 48.8566, longitude: 2.3522, popular_places_count: 150, image_url: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800" }
       ];
     }
@@ -198,7 +246,7 @@ export const apiService = {
   // Budget Breakdown
   async getTripBudget(tripId: string): Promise<BudgetSummary> {
     try {
-      const res = await apiClient.get<BudgetSummary>(`/trips/${tripId}/budget`);
+      const res = await apiClient.get<BudgetSummary>(`/budget/${tripId}`);
       return res.data;
     } catch {
       return {
@@ -219,7 +267,7 @@ export const apiService = {
   // Share Public Link
   async getSharedTrip(slug: string): Promise<Trip> {
     try {
-      const res = await apiClient.get<Trip>(`/share/${slug}`);
+      const res = await apiClient.get<Trip>(`/sharing/${slug}`);
       return res.data;
     } catch {
       return { ...MOCK_TRIP, share_slug: slug };

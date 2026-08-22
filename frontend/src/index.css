@@ -5,12 +5,53 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply bg-slate-950 text-slate-100 font-sans antialiased min-h-screen selection:bg-sky-500 selection:text-white;
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 199 89% 48%;
+    --radius: 0.75rem;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', sans-serif;
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased min-h-screen;
   }
 }
 
@@ -20,4 +61,496 @@
 
 .glass-button {
   @apply bg-sky-500 hover:bg-sky-400 text-white font-medium px-5 py-2.5 rounded-xl transition-all duration-200 shadow-lg shadow-sky-500/20 active:scale-95;
+}
+
+@theme inline {
+  /* Typography */
+  --font-heading: var(--font-sans);
+  --font-sans: "Geist Variable", sans-serif;
+
+  /* =====================================================
+       Typography Scale
+       ===================================================== */
+
+  --text-display: 3.5rem;
+  --text-h1: 2.75rem;
+  --text-h2: 2rem;
+  --text-h3: 1.5rem;
+  --text-h4: 1.25rem;
+
+  --text-body-lg: 1.125rem;
+  --text-body: 1rem;
+  --text-body-sm: 0.875rem;
+  --text-label: 0.875rem;
+  --text-caption: 0.75rem;
+
+  /* Typography line heights */
+
+  --leading-display: 1.05;
+  --leading-heading: 1.15;
+  --leading-body: 1.5;
+  --leading-caption: 1.4;
+
+  /* Typography letter spacing */
+
+  --tracking-display: -0.035em;
+  --tracking-heading: -0.025em;
+  --tracking-body: 0;
+  --tracking-label: 0.01em;
+  --tracking-caption: 0.015em;
+
+
+  /* Shadcn semantic colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Charts */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* GlobeTrotter brand colors */
+  --color-travel-blue: var(--travel-blue);
+  --color-travel-blue-hover: var(--travel-blue-hover);
+  --color-travel-coral: var(--travel-coral);
+  --color-travel-green: var(--travel-green);
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+
+/* =========================================================
+   LIGHT MODE
+   ========================================================= */
+
+:root {
+
+  /* ---------- Brand ---------- */
+
+  --travel-blue: #007AFF;
+  --travel-blue-hover: #0066D6;
+  --travel-coral: #FF7A59;
+  --travel-green: #34C759;
+
+
+  /* ---------- Core ---------- */
+
+  --background: #F5F5F7;
+  --foreground: #1D1D1F;
+
+  --card: #FFFFFF;
+  --card-foreground: #1D1D1F;
+
+  --popover: #FFFFFF;
+  --popover-foreground: #1D1D1F;
+
+
+  /* ---------- Actions ---------- */
+
+  --primary: var(--travel-blue);
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #EDEDF0;
+  --secondary-foreground: #1D1D1F;
+
+  --muted: #F0F0F2;
+  --muted-foreground: #6E6E73;
+
+  --accent: #E8F2FF;
+  --accent-foreground: #0066D6;
+
+
+  /* ---------- States ---------- */
+
+  --destructive: #FF3B30;
+
+
+  /* ---------- Borders / Inputs ---------- */
+
+  --border: #E5E5EA;
+  --input: #E5E5EA;
+  --ring: var(--travel-blue);
+
+
+  /* ---------- Charts ---------- */
+
+  --chart-1: var(--travel-blue);
+  --chart-2: var(--travel-green);
+  --chart-3: var(--travel-coral);
+  --chart-4: #5856D6;
+  --chart-5: #FF9500;
+
+
+  /* ---------- Sidebar ---------- */
+
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1D1D1F;
+
+  --sidebar-primary: var(--travel-blue);
+  --sidebar-primary-foreground: #FFFFFF;
+
+  --sidebar-accent: #F0F5FF;
+  --sidebar-accent-foreground: #0066D6;
+
+  --sidebar-border: #E5E5EA;
+  --sidebar-ring: var(--travel-blue);
+
+
+  /* ---------- Shape ---------- */
+
+  --radius: 0.75rem;
+
+
+  /* ---------- Glass ---------- */
+
+  --glass-background: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.55);
+  --glass-blur: 24px;
+
+
+  /* ---------- Shadows ---------- */
+
+  --shadow-soft:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.06);
+
+  --shadow-card:
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 12px 32px rgba(0, 0, 0, 0.06);
+
+  --shadow-floating:
+    0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+.dark {
+
+  --background: #0B0B0E;
+  --foreground: #F5F5F7;
+
+  --card: #161619;
+  --card-foreground: #F5F5F7;
+
+  --popover: #161619;
+  --popover-foreground: #F5F5F7;
+
+
+  /* ---------- Actions ---------- */
+
+  --primary: #0A84FF;
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #242428;
+  --secondary-foreground: #F5F5F7;
+
+  --muted: #1E1E22;
+  --muted-foreground: #98989D;
+
+  --accent: #102A4A;
+  --accent-foreground: #64B5FF;
+
+
+  /* ---------- States ---------- */
+
+  --destructive: #FF453A;
+
+
+  /* ---------- Borders / Inputs ---------- */
+
+  --border: rgba(255, 255, 255, 0.10);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #0A84FF;
+
+
+  /* ---------- Charts ---------- */
+
+  --chart-1: #0A84FF;
+  --chart-2: #30D158;
+  --chart-3: #FF9F0A;
+  --chart-4: #5E5CE6;
+  --chart-5: #FF375F;
+
+
+  /* ---------- Sidebar ---------- */
+
+  --sidebar: #111114;
+  --sidebar-foreground: #F5F5F7;
+
+  --sidebar-primary: #0A84FF;
+  --sidebar-primary-foreground: #FFFFFF;
+
+  --sidebar-accent: #1E2A3A;
+  --sidebar-accent-foreground: #64B5FF;
+
+  --sidebar-border: rgba(255, 255, 255, 0.10);
+  --sidebar-ring: #0A84FF;
+
+
+  /* ---------- Glass ---------- */
+
+  --glass-background: rgba(22, 22, 25, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-blur: 24px;
+
+
+  /* ---------- Shadows ---------- */
+
+  --shadow-soft:
+    0 1px 2px rgba(0, 0, 0, 0.20),
+    0 8px 24px rgba(0, 0, 0, 0.25);
+
+  --shadow-card:
+    0 2px 8px rgba(0, 0, 0, 0.20),
+    0 12px 32px rgba(0, 0, 0, 0.30);
+
+  --shadow-floating:
+    0 8px 32px rgba(0, 0, 0, 0.40);
+}
+
+
+/* =========================================================
+   BASE STYLES
+   ========================================================= */
+
+@layer base {
+
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    min-height: 100vh;
+
+    /* Apple-like text rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Prevent horizontal overflow */
+    overflow-x: hidden;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  ::selection {
+    background: color-mix(in srgb,
+        var(--travel-blue) 20%,
+        transparent);
+
+    color: var(--foreground);
+  }
+}
+
+
+/* =========================================================
+   GLOBETROTTER UTILITIES
+   ========================================================= */
+
+@layer utilities {
+
+  /* =====================================================
+       Typography Utilities
+       ===================================================== */
+
+  .type-display {
+    font-size: var(--text-display);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    font-weight: 600;
+  }
+
+  .type-h1 {
+    font-size: var(--text-h1);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+    font-weight: 600;
+  }
+
+  .type-h2 {
+    font-size: var(--text-h2);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+    font-weight: 600;
+  }
+
+  .type-h3 {
+    font-size: var(--text-h3);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+    font-weight: 600;
+  }
+
+  .type-h4 {
+    font-size: var(--text-h4);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+    font-weight: 600;
+  }
+
+  .type-body-lg {
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-body);
+    font-weight: 400;
+  }
+
+  .type-body {
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    font-weight: 400;
+  }
+
+  .type-body-sm {
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body);
+    font-weight: 400;
+  }
+
+  .type-label {
+    font-size: var(--text-label);
+    line-height: var(--leading-caption);
+    letter-spacing: var(--tracking-label);
+    font-weight: 500;
+  }
+
+  .type-caption {
+    font-size: var(--text-caption);
+    line-height: var(--leading-caption);
+    letter-spacing: var(--tracking-caption);
+    font-weight: 500;
+  }
+
+  /* Glass surface */
+
+  .glass {
+    background: var(--glass-background);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  }
+
+
+  /* Apple-style card */
+
+  .travel-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-card);
+  }
+
+
+  /* Floating element */
+
+  .floating-surface {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-floating);
+  }
+
+
+  /* Smooth interaction */
+
+  .interactive {
+    transition:
+      transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1),
+      background-color 200ms ease,
+      border-color 200ms ease;
+  }
+
+
+  .interactive:hover {
+    transform: translateY(-2px);
+  }
+
+
+  /* Reduced motion */
+
+  @media (prefers-reduced-motion: reduce) {
+
+    .interactive {
+      transition: none;
+    }
+
+    .interactive:hover {
+      transform: none;
+    }
+
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+
+  .type-display {
+    font-size: 2.75rem;
+  }
+
+  .type-h1 {
+    font-size: 2.25rem;
+  }
+
+  .type-h2 {
+    font-size: 1.75rem;
+  }
 }

@@ -17,6 +17,7 @@ export interface Activity {
   id: string;
   stop_id: string;
   title: string;
+  name?: string;
   description?: string;
   category: ActivityCategory;
   cost: number;
@@ -55,20 +56,61 @@ export interface Expense {
 export interface Trip {
   id: string;
   user_id?: string;
-  title: string;
+  creator_id?: string;
+  name: string;
+  title?: string;
   description?: string;
   destination: string;
   start_date?: string;
   end_date?: string;
+  startDate?: string;
+  endDate?: string;
   duration_days: number;
-  total_budget: number;
+  budget: number;
+  total_budget?: number;
   currency: string;
   cover_image_url?: string;
-  is_public: boolean;
+  cover_photo_url?: string;
+  coverImage?: string;
+  status?: string;
+  is_public?: boolean;
   share_slug?: string;
-  created_at: string;
-  stops: Stop[];
-  expenses: Expense[];
+  destination_count?: number;
+  travelers?: number;
+  created_at?: string;
+  createdAt?: string;
+  stops?: Stop[];
+  expenses?: Expense[];
+}
+
+export interface CreateTripPayload {
+  name: string;
+  destination: string;
+  startDate?: string;
+  endDate?: string;
+  start_date?: string;
+  end_date?: string;
+  duration_days?: number;
+  travelers?: number;
+  budget: number;
+  currency?: string;
+  is_public?: boolean;
+}
+
+export interface UpdateTripPayload {
+  name?: string;
+  description?: string;
+  destination?: string;
+  startDate?: string;
+  endDate?: string;
+  start_date?: string;
+  end_date?: string;
+  duration_days?: number;
+  travelers?: number;
+  budget?: number;
+  currency?: string;
+  status?: string;
+  is_public?: boolean;
 }
 
 export interface CategoryExpenseSummary {
@@ -139,8 +181,13 @@ export interface CitySearchResult {
   id: string;
   name: string;
   country: string;
+  region?: string;
   latitude: number;
   longitude: number;
-  popular_places_count: number;
-  image_url: string;
+  cost_index?: number;
+  popularity_score?: number;
+  description?: string;
+  popular_places_count?: number;
+  image_url?: string;
+  cover_image_url?: string;
 }
