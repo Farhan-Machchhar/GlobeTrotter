@@ -7,18 +7,28 @@ from app.schemas.trip import PlanTripRequest, AITripPlanResponse, AIStopItem, AI
 logger = logging.getLogger("globetrotter.gemini")
 
 
+import os
+
 class GeminiService:
     def __init__(self):
-        self.api_key = settings.GEMINI_API_KEY
+        pass
+
+    @property
+    def api_key(self) -> Optional[str]:
+        key = os.getenv("GEMINI_API_KEY") or settings.GEMINI_API_KEY
+        if key and not key.startswith("your_"):
+            return key
+        return None
 
     async def generate_trip_plan(self, req: PlanTripRequest) -> AITripPlanResponse:
         """
         Generates a structured AI trip plan using Gemini 2.5/1.5 API.
         Falls back to intelligent mock plan generation if API key is missing or request fails.
         """
-        if self.api_key:
+        active_key = self.api_key
+        if active_key:
             try:
-                plan = await self._call_gemini_api(req)
+                plan = await self._call_gemini_api(req, active_key)
                 if plan:
                     return plan
             except Exception as e:
@@ -26,7 +36,7 @@ class GeminiService:
         
         return self._generate_fallback_plan(req)
 
-    async def _call_gemini_api(self, req: PlanTripRequest) -> Optional[AITripPlanResponse]:
+    async def _call_gemini_api(self, req: PlanTripRequest, active_key: str) -> Optional[AITripPlanResponse]:
         import httpx
         
         system_instruction = """You are an expert AI Travel Concierge for GlobeTrotter.
@@ -79,7 +89,7 @@ Interests: {', '.join(req.interests) if req.interests else 'General exploration'
 
 Please generate the trip plan in strict JSON."""
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={active_key}"
         headers = {"Content-Type": "application/json"}
         payload = {
             "contents": [
