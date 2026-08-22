@@ -75,119 +75,108 @@ function Dashboard() {
 
                     <h1 className="type-h1 font-heading text-4xl font-extrabold tracking-tight sm:text-5xl">
                         Good day, {userName}{" "}
-                        <span aria-hidden="true">👋</span>
+                        <span className="inline-block animate-bounce">👋</span>
                     </h1>
 
-                    <p className="mt-3 max-w-xl type-body text-muted-foreground">
-                        Ready to plan your next adventure?
-                        Discover new places, organize your multi-city itineraries,
-                        and keep everything in one place.
+                    <p className="mt-3 text-lg text-muted-foreground">
+                        Ready to design your next epic adventure? Let AI craft your itinerary or build one manually.
                     </p>
                 </div>
 
-                <Link to="/create-trip" className="inline-flex">
-                    <Button size="lg" className="gap-2 shadow-lg">
-                        <Plus className="size-5" />
-                        Plan New Trip
-                    </Button>
-                </Link>
+                <div className="flex gap-3">
+                    <Link to="/create-trip">
+                        <Button size="lg" className="gap-2 shadow-lg shadow-primary/20">
+                            <Plus className="size-5" />
+                            Plan New Trip
+                        </Button>
+                    </Link>
+                </div>
             </section>
 
-            {/* AI Trip Planner Prompt Bar */}
-            <section className="rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-primary/5 p-6 sm:p-8 shadow-xl">
-                <div className="flex items-center gap-2 text-xs font-semibold text-primary uppercase tracking-wider mb-2">
-                    <Sparkles className="size-4 animate-pulse text-amber-500" />
-                    Gemini AI Trip Concierge
-                </div>
+            {/* AI Trip Planner Quick Bar */}
+            <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-r from-sky-950/40 via-slate-900 to-slate-950 p-6">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-xs font-semibold uppercase text-sky-400">
+                            <Sparkles className="size-4 text-amber-400" />
+                            Gemini 2.5 AI Travel Concierge
+                        </div>
+                        <h2 className="text-xl font-bold">Where would you like to travel?</h2>
+                        <p className="text-sm text-muted-foreground">
+                            Type any destination or trip dream to generate an interactive map & itinerary instantly.
+                        </p>
+                    </div>
 
-                <h2 className="text-2xl font-bold font-heading sm:text-3xl mb-2">
-                    Where would you like to go next?
-                </h2>
-                <p className="text-sm text-muted-foreground mb-6">
-                    Type a destination, budget, or interests and let AI craft your itinerary in seconds.
-                </p>
-
-                <form onSubmit={handleAIPromptSubmit} className="flex flex-col sm:flex-row gap-3">
-                    <input
-                        type="text"
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        placeholder="e.g. Plan a 6-day Japan trip under ₹60,000 with anime & nature..."
-                        className="flex-1 rounded-xl border border-border bg-background/90 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                    <Button type="submit" size="lg" disabled={isGenerating} className="gap-2 min-w-[150px]">
-                        {isGenerating ? (
-                            <>
-                                <Sparkles className="size-4 animate-spin" />
-                                Generating...
-                            </>
-                        ) : (
-                            <>
-                                <Sparkles className="size-4" />
-                                Plan with AI
-                            </>
-                        )}
-                    </Button>
-                </form>
-            </section>
-
-            {/* Quick Actions */}
-            <section>
-                <div className="mb-4">
-                    <h2 className="type-h3 font-heading font-bold text-xl">
-                        Quick actions
-                    </h2>
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-3">
-                    <Link to="/create-trip" className="block">
-                        <Button
-                            variant="outline"
-                            className="h-auto w-full justify-start px-4 py-4 gap-3 text-left font-medium"
-                        >
-                            <Map className="size-5 text-primary" />
-                            <span>Plan a trip</span>
+                    <form onSubmit={handleAIPromptSubmit} className="flex w-full gap-2 md:w-auto md:min-w-[400px]">
+                        <input
+                            type="text"
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            placeholder="e.g. 4-day trip to Goa beaches under ₹30,000"
+                            className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        />
+                        <Button type="submit" disabled={isGenerating} className="shrink-0 gap-2">
+                            {isGenerating ? <Sparkles className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+                            Plan
                         </Button>
-                    </Link>
-
-                    <Link to="/discover" className="block">
-                        <Button
-                            variant="outline"
-                            className="h-auto w-full justify-start px-4 py-4 gap-3 text-left font-medium"
-                        >
-                            <Compass className="size-5 text-primary" />
-                            <span>Explore destinations</span>
-                        </Button>
-                    </Link>
-
-                    <Link to="/my-trips" className="block">
-                        <Button
-                            variant="outline"
-                            className="h-auto w-full justify-start px-4 py-4 gap-3 text-left font-medium"
-                        >
-                            <Wallet className="size-5 text-primary" />
-                            <span>View my trips</span>
-                        </Button>
-                    </Link>
+                    </form>
                 </div>
+            </Card>
+
+            {/* Overview Quick Stats Grid */}
+            <section className="grid gap-6 sm:grid-cols-3">
+                <Card className="p-6">
+                    <div className="flex items-center gap-4">
+                        <div className="flex size-12 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-500">
+                            <Map className="size-6" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">Active Trips</p>
+                            <h3 className="type-h2 font-heading text-2xl font-bold">{trips.length}</h3>
+                        </div>
+                    </div>
+                </Card>
+
+                <Card className="p-6">
+                    <div className="flex items-center gap-4">
+                        <div className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500">
+                            <Compass className="size-6" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">Cities Visited</p>
+                            <h3 className="type-h2 font-heading text-2xl font-bold">
+                                {trips.reduce((acc, t) => acc + (t.stops?.length || t.destination_count || 1), 0)}
+                            </h3>
+                        </div>
+                    </div>
+                </Card>
+
+                <Card className="p-6">
+                    <div className="flex items-center gap-4">
+                        <div className="flex size-12 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500">
+                            <Wallet className="size-6" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">Budget Allocated</p>
+                            <h3 className="type-h2 font-heading text-2xl font-bold">
+                                ₹{totalBudget.toLocaleString()}
+                            </h3>
+                        </div>
+                    </div>
+                </Card>
             </section>
 
             {/* Upcoming Trips */}
             <section>
-                <div className="mb-5 flex items-end justify-between">
+                <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <p className="mb-1 text-xs font-semibold text-primary uppercase tracking-wider">
-                            YOUR JOURNEYS
-                        </p>
-
-                        <h2 className="type-h2 font-heading font-bold text-2xl">
-                            Upcoming trips
-                        </h2>
+                        <h2 className="type-h2 font-heading text-2xl font-bold">Your Upcoming Trips</h2>
+                        <p className="text-sm text-muted-foreground">Your active multi-city travel itineraries.</p>
                     </div>
 
-                    <Link to="/my-trips" className="inline-flex">
-                        <Button variant="ghost" size="sm" className="gap-1">
-                            View all
+                    <Link to="/my-trips">
+                        <Button variant="ghost" size="sm" className="gap-2">
+                            View all ({trips.length})
                             <ArrowRight className="size-4" />
                         </Button>
                     </Link>
@@ -274,105 +263,38 @@ function Dashboard() {
 
             {/* Featured Destinations */}
             <section>
-                <div className="mb-5 flex items-end justify-between">
+                <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <p className="mb-1 text-xs font-semibold text-primary uppercase tracking-wider">
-                            GET INSPIRED
-                        </p>
-
-                        <h2 className="type-h2 font-heading font-bold text-2xl">
-                            Explore destinations
-                        </h2>
+                        <h2 className="type-h2 font-heading text-2xl font-bold">Popular Destinations</h2>
+                        <p className="text-sm text-muted-foreground">Explore curated cities for your next getaway.</p>
                     </div>
 
-                    <Link to="/discover" className="inline-flex">
-                        <Button variant="ghost" size="sm" className="gap-1">
-                            Discover more
+                    <Link to="/discover">
+                        <Button variant="ghost" size="sm" className="gap-2">
+                            Explore all
                             <ArrowRight className="size-4" />
                         </Button>
                     </Link>
                 </div>
 
-                <div className="grid gap-5 md:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-3">
                     {destinations.map((dest) => (
-                        <Card key={dest.id} className="overflow-hidden group hover:shadow-md transition-all">
-                            <div className="aspect-[4/3] w-full overflow-hidden bg-slate-900">
+                        <Card key={dest.id} className="group overflow-hidden">
+                            <div className="relative aspect-[4/3] overflow-hidden">
                                 <img
                                     src={dest.image_url || dest.cover_image_url || "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=800"}
                                     alt={dest.name}
-                                    className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    className="size-full object-cover transition duration-300 group-hover:scale-105"
                                 />
-                            </div>
-
-                            <div className="p-5">
-                                <div className="flex items-start justify-between gap-3">
-                                    <div>
-                                        <h3 className="type-h3 font-heading font-bold text-lg">
-                                            {dest.name}
-                                        </h3>
-                                        <p className="text-sm text-muted-foreground">
-                                            {dest.country}
-                                        </p>
-                                    </div>
-
-                                    <Badge variant="outline">
-                                        {dest.cost_index ? `${dest.cost_index}/10 Cost` : "Top Rated"}
-                                    </Badge>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                                <div className="absolute bottom-4 left-4 right-4 text-white">
+                                    <h3 className="type-h3 font-heading text-lg font-bold">{dest.name}</h3>
+                                    <p className="text-xs opacity-90">{dest.country}</p>
                                 </div>
-
-                                <p className="mt-3 text-sm leading-relaxed text-muted-foreground line-clamp-2">
-                                    {dest.description || `Experience the rich history and culture of ${dest.name}.`}
-                                </p>
                             </div>
                         </Card>
                     ))}
                 </div>
-            </section>
-
-            {/* Budget Highlights */}
-            <section>
-                <div className="mb-5">
-                    <p className="mb-1 text-xs font-semibold text-primary uppercase tracking-wider">
-                        TRIP OVERVIEW
-                    </p>
-
-                    <h2 className="type-h2 font-heading font-bold text-2xl">
-                        Budget highlights
-                    </h2>
-                </div>
-
-                <Card className="p-6">
-                    <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <p className="text-sm text-muted-foreground">
-                                Total planned spending across active trips
-                            </p>
-
-                            <div className="mt-1 flex items-baseline gap-2">
-                                <span className="text-3xl font-bold tracking-tight">
-                                    ₹{totalSpent > 0 ? totalSpent.toLocaleString("en-IN") : "35,000"}
-                                </span>
-
-                                <span className="text-sm text-muted-foreground">
-                                    of ₹{totalBudget > 0 ? totalBudget.toLocaleString("en-IN") : "60,000"}
-                                </span>
-                            </div>
-                        </div>
-
-                        <Badge variant="secondary" className="text-sm font-semibold">
-                            {budgetPercentage}% used
-                        </Badge>
-                    </div>
-
-                    <div className="mt-6">
-                        <div className="h-2.5 overflow-hidden rounded-full bg-muted">
-                            <div
-                                className="h-full rounded-full bg-primary transition-all duration-500"
-                                style={{ width: `${budgetPercentage}%` }}
-                            />
-                        </div>
-                    </div>
-                </Card>
             </section>
 
         </PageContainer>

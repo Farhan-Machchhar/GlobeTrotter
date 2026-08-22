@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Compass,
   MapPin,
@@ -68,12 +68,10 @@ export function Discover() {
     setDialogOpen(true)
   }
 
-  const filteredDestinations = useMemo(() => {
-    return cities.filter((city) => {
-      const matchesRegion = region === "All" || (city.region && city.region === region)
-      return matchesRegion
-    })
-  }, [cities, region])
+  const filteredDestinations = cities.filter((city) => {
+    const matchesRegion = region === "All" || (city.region && city.region === region)
+    return matchesRegion
+  })
 
   return (
     <PageContainer>

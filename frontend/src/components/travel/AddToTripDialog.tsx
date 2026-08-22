@@ -61,7 +61,6 @@ export function AddToTripDialog({
                     city_name: itemName,
                 })
             } else {
-                // If adding activity, attempt adding stop or day activity
                 await apiClient.post(`/trips/${selectedTrip}/stops`, {
                     city_name: itemName,
                     notes: `Activity: ${itemName}`,
@@ -78,8 +77,8 @@ export function AddToTripDialog({
             setAdded(true)
             setTimeout(() => {
                 onOpenChange(false)
-                setAdded(false);
-            }, 900);
+                setAdded(false)
+            }, 900)
         }
     }
 

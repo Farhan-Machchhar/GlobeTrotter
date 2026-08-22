@@ -65,10 +65,10 @@ export interface Trip {
   end_date?: string;
   startDate?: string;
   endDate?: string;
-  duration_days: number;
-  budget: number;
+  duration_days?: number;
+  budget?: number;
   total_budget?: number;
-  currency: string;
+  currency?: string;
   cover_image_url?: string;
   cover_photo_url?: string;
   coverImage?: string;
@@ -84,21 +84,26 @@ export interface Trip {
 }
 
 export interface CreateTripPayload {
-  name: string;
-  destination: string;
+  name?: string;
+  title?: string;
+  destination?: string;
   startDate?: string;
   endDate?: string;
   start_date?: string;
   end_date?: string;
   duration_days?: number;
   travelers?: number;
-  budget: number;
+  budget?: number;
+  total_budget?: number;
   currency?: string;
   is_public?: boolean;
+  cover_image_url?: string;
+  cover_photo_url?: string;
 }
 
 export interface UpdateTripPayload {
   name?: string;
+  title?: string;
   description?: string;
   destination?: string;
   startDate?: string;
@@ -108,9 +113,12 @@ export interface UpdateTripPayload {
   duration_days?: number;
   travelers?: number;
   budget?: number;
+  total_budget?: number;
   currency?: string;
   status?: string;
   is_public?: boolean;
+  cover_image_url?: string;
+  cover_photo_url?: string;
 }
 
 export interface CategoryExpenseSummary {

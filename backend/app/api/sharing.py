@@ -17,6 +17,7 @@ from app.database.session import get_db
 from app.models import Share, Stop, Trip, User
 from app.schemas.trip import PublicTripResponse, ShareResponse, StopResponse, TripResponse
 
+
 logger = logging.getLogger("globetrotter.sharing")
 router = APIRouter(prefix="/sharing", tags=["Sharing"])
 

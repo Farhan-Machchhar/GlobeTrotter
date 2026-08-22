@@ -22,8 +22,8 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (name: string, email: string, password: string) => Promise<boolean>;
+  login: (email: string, password?: string) => Promise<boolean>;
+  signup: (name: string, email: string, password?: string) => Promise<boolean>;
   logout: () => void;
   checkAuth: () => Promise<void>;
 }
@@ -37,7 +37,7 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       error: null,
 
-      login: async (email, password) => {
+      login: async (email, password = "password123") => {
         set({ isLoading: true, error: null });
         try {
           const response = await axios.post(`${API_BASE_URL}/auth/login`, {
@@ -90,7 +90,7 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      signup: async (name, email, password) => {
+      signup: async (name, email, password = "password123") => {
         set({ isLoading: true, error: null });
         try {
           const [first_name, ...rest] = name.split(" ");
@@ -182,8 +182,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
           });
         } catch {
-          // If token invalid, clear
-          if (token.startsWith("demo-")) return; // keep demo token
+          if (token.startsWith("demo-")) return;
           localStorage.removeItem("token");
           set({ user: null, token: null, isAuthenticated: false });
         }

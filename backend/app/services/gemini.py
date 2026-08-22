@@ -9,6 +9,7 @@ from app.schemas.trip import (
     PlanTripRequest, AITripPlanResponse, AIStopItem, AIActivityItem, AIBudgetBreakdown
 )
 
+
 logger = logging.getLogger("globetrotter.gemini")
 
 
@@ -50,6 +51,7 @@ The output JSON MUST follow this exact schema structure:
   "title": "string (e.g. Magical 6-Day Japan Highlights)",
   "description": "string (brief overview of the trip)",
   "destination": "string (main destination or region)",
+
   "total_days": integer,
   "estimated_total_cost": float,
   "currency": "INR" or requested currency,
@@ -92,6 +94,7 @@ Budget: {req.budget or 50000} {req.currency or 'INR'}
 Interests: {', '.join(req.interests) if req.interests else 'General exploration'}
 
 Please generate a realistic, tailored travel plan in strict JSON format matching the requested destination, duration, and budget."""
+
 
         # Try google-genai SDK
         try:
@@ -549,5 +552,5 @@ Please generate a realistic, tailored travel plan in strict JSON format matching
             budget_breakdown=self._build_budget_breakdown(budget)
         )
 
-
 gemini_service = GeminiService()
+

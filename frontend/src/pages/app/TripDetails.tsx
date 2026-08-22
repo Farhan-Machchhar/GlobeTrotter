@@ -30,9 +30,17 @@ import {
   deleteTrip,
   getTrip,
 } from "@/services/tripService"
-import { apiClient } from "@/services/api"
+import { apiClient, apiService } from "@/services/api"
 import type { Trip } from "@/types/trip"
 import { ErrorState } from "@/components/travel/ErrorState"
+
+import { useQuery } from "@tanstack/react-query"
+import { useTravelStore } from "@/store/travelStore"
+import { WorldMap } from "@/components/map/WorldMap"
+import { CitySearch } from "@/components/discovery/CitySearch"
+import { ItineraryBuilder } from "@/components/itinerary/ItineraryBuilder"
+import { TripTimeline } from "@/components/timeline/TripTimeline"
+import { BudgetDashboard } from "@/components/budget/BudgetDashboard"
 
 function TripDetails() {
   const { id } = useParams()
@@ -44,18 +52,34 @@ function TripDetails() {
   const [shareUrl, setShareUrl] = useState("")
   const [copied, setCopied] = useState(false)
 
+  const { selectedTripId } = useTravelStore()
+
+  const { data: cities = [] } = useQuery({
+    queryKey: ['cities', ''],
+    queryFn: () => apiService.searchCities('')
+  })
+
+  useEffect(() => {
+    if (id && id !== selectedTripId) {
+      useTravelStore.getState().setSelectedTripId(id);
+    }
+  }, [id, selectedTripId])
+
   useEffect(() => {
     if (!id) return
 
     async function loadTrip(tripId: string) {
       try {
+        setLoading(true)
+        setError("")
+
         const data = await getTrip(tripId)
         setTrip(data)
-      } catch (error) {
+      } catch (err) {
         setError(
-          error instanceof Error
-            ? error.message
-            : "Unable to load trip."
+          err instanceof Error
+            ? err.message
+            : "Unable to load trip details."
         )
       } finally {
         setLoading(false)
@@ -65,79 +89,79 @@ function TripDetails() {
     loadTrip(id)
   }, [id])
 
-  async function handleShare() {
-    if (!id) return
+  const handleDelete = async () => {
+    if (!id || !window.confirm("Are you sure you want to delete this trip?")) return
+
     try {
-      const res = await apiClient.post(`/sharing/${id}/share`)
-      const url = res.data.share_url || `${window.location.origin}/share/${res.data.slug}`
-      setShareUrl(url)
-      navigator.clipboard.writeText(url)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 3000)
-    } catch {
-      // Fallback share url
-      const url = `${window.location.origin}/share/${trip?.share_slug || id}`
-      setShareUrl(url)
-      navigator.clipboard.writeText(url)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 3000)
+      setLoading(true)
+      await deleteTrip(id)
+      navigate("/my-trips")
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to delete trip."
+      )
+      setLoading(false)
     }
   }
 
-  async function handleDelete() {
-    if (!id) return
-
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this trip?"
-    )
-
-    if (!confirmed) return
-
+  const handleShare = async () => {
+    if (!id || !trip) return
     try {
-      await deleteTrip(id)
-      navigate("/my-trips")
-    } catch (error) {
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Unable to delete trip."
-      )
+      const res = await apiClient.post(`/sharing/${id}/share`)
+      const link = res.data.share_url || `${window.location.origin}/share/${res.data.slug || trip.share_slug}`
+      setShareUrl(link)
+      navigator.clipboard.writeText(link)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 3000)
+    } catch {
+      const fallbackLink = `${window.location.origin}/share/${trip.share_slug || id}`
+      setShareUrl(fallbackLink)
+      navigator.clipboard.writeText(fallbackLink)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 3000)
     }
   }
 
   if (loading) {
     return (
-      <main className="mx-auto max-w-4xl px-4 py-16 text-center text-muted-foreground">
-        Loading trip details...
+      <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="py-20 text-center text-sm text-muted-foreground">
+          Loading itinerary & map...
+        </div>
       </main>
     )
   }
 
   if (error || !trip) {
     return (
-      <main className="mx-auto max-w-4xl px-4 py-16">
+      <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <Link
+          to="/my-trips"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          Back to my trips
+        </Link>
+
         <ErrorState
-          title={error ? "Unable to load trip" : "Trip not found"}
-          description={
-            error ||
-            "We couldn't find the trip you're looking for."
-          }
+          description={error || "Trip not found."}
           onRetry={() => window.location.reload()}
         />
       </main>
     )
   }
 
-  const tripName = trip.name || trip.title || "Untitled Trip"
   const startDate = trip.start_date || trip.startDate || "Flexible"
   const endDate = trip.end_date || trip.endDate || "Flexible"
   const budgetVal = trip.budget || trip.total_budget || 0
   const currency = trip.currency || "₹"
+  const tripName = trip.name || trip.title || "Untitled Trip"
   const coverImage = trip.cover_image_url || trip.cover_photo_url || "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1200"
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
-
+    <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
       <Link
         to="/my-trips"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -240,15 +264,32 @@ function TripDetails() {
         </CardContent>
       </Card>
 
-      {/* Itinerary & Day-wise Activities */}
+      {/* Map & Discovery Grid */}
       <section className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="h-[550px] rounded-2xl overflow-hidden border border-border shadow-sm">
+            <WorldMap trip={trip} cities={cities} />
+          </div>
+          <div className="flex flex-col gap-6 max-h-[550px] overflow-y-auto pr-1">
+            <CitySearch />
+            <ItineraryBuilder />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+          <TripTimeline />
+          <BudgetDashboard />
+        </div>
+      </section>
+
+      {/* Detailed Stops & Activity Breakdown */}
+      <section className="space-y-6 pt-6">
         <div className="flex items-center justify-between">
           <h2 className="font-heading text-2xl font-bold tracking-tight">
-            Day-by-Day Itinerary
+            Day-by-Day Itinerary Breakdown
           </h2>
           <Button variant="outline" size="sm" onClick={() => navigate('/create-trip')}>
             <Sparkles className="size-4 mr-2 text-amber-500" />
-            Add Destination / Stop
+            Add Stop / AI Plan
           </Button>
         </div>
 
@@ -296,7 +337,7 @@ function TripDetails() {
                           </span>
                           {act.latitude && (
                             <span className="flex items-center gap-1 text-primary">
-                              <MapPin className="size-3.5" /> Map Location ({act.latitude}, {act.longitude})
+                              <MapPin className="size-3.5" /> Coordinates ({act.latitude}, {act.longitude})
                             </span>
                           )}
                         </div>

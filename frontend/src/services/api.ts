@@ -7,6 +7,8 @@ import type {
   CitySearchResult,
   CreateTripPayload,
   UpdateTripPayload,
+  Activity,
+  Stop,
 } from '../types/trip';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -19,31 +21,35 @@ export const apiClient = axios.create({
   timeout: 20000,
 });
 
-// Attach JWT token automatically if available
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
+  if (token && !token.startsWith('demo-')) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-// Demo fallback mock trip for development testing when server offline
-const MOCK_TRIP: Trip = {
+export const MOCK_TRIP: Trip = {
   id: "japan-demo-2025",
-  name: "6-Day Japan Adventure",
-  title: "6-Day Japan Adventure",
-  description: "Epic journey through Tokyo anime culture, Kyoto temples, and natural wonders.",
+  name: "Grand 6-Day Japan Highlights",
+  title: "Grand 6-Day Japan Highlights",
+  description: "Experience neon skyscrapers, ancient shrines, bullet trains, and gourmet cuisine.",
   destination: "Japan",
+  start_date: "2026-09-10",
+  end_date: "2026-09-16",
+  startDate: "2026-09-10",
+  endDate: "2026-09-16",
   duration_days: 6,
   budget: 60000,
   total_budget: 60000,
   currency: "INR",
   cover_image_url: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1200",
   cover_photo_url: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1200",
+  status: "planning",
   is_public: true,
-  share_slug: "japan-demo-2025",
-  created_at: new Date().toISOString(),
+  share_slug: "japan-highlights-demo",
+  destination_count: 2,
+  travelers: 2,
   stops: [
     {
       id: "stop-tokyo",
@@ -57,8 +63,9 @@ const MOCK_TRIP: Trip = {
         {
           id: "act-1",
           stop_id: "stop-tokyo",
-          title: "Explore Akihabara Electric Town",
-          description: "Anime shops, retro arcade gaming, tech stores.",
+          title: "Akihabara Tech & Anime Tour",
+          name: "Akihabara Tech & Anime Tour",
+          description: "Explore multi-story gaming centers and electronic stores.",
           category: "culture",
           cost: 2500,
           duration_mins: 180,
@@ -70,8 +77,9 @@ const MOCK_TRIP: Trip = {
         {
           id: "act-2",
           stop_id: "stop-tokyo",
-          title: "Senso-ji Temple & Asakusa Street Food",
-          description: "Visit Tokyo's oldest temple & enjoy local treats.",
+          title: "Senso-ji Temple & Asakusa Food Tour",
+          name: "Senso-ji Temple & Asakusa Food Tour",
+          description: "Visit Tokyo's oldest temple and enjoy traditional street food.",
           category: "food",
           cost: 3000,
           duration_mins: 150,
@@ -94,8 +102,9 @@ const MOCK_TRIP: Trip = {
         {
           id: "act-3",
           stop_id: "stop-kyoto",
-          title: "Fushimi Inari Taisha Torii Gate Hike",
-          description: "Hike through 10,000 orange torii gates.",
+          title: "Fushimi Inari Torii Gate Hike",
+          name: "Fushimi Inari Torii Gate Hike",
+          description: "Hike through 10,000 orange torii gates up Mt. Inari.",
           category: "nature",
           cost: 0,
           duration_mins: 180,
@@ -182,25 +191,28 @@ export const apiService = {
     return res.data;
   },
 
-  async createTrip(payload: CreateTripPayload | Partial<Trip>): Promise<Trip> {
+  async createTrip(payload: CreateTripPayload): Promise<Trip> {
     if (USE_MOCK_API) {
       return {
         ...MOCK_TRIP,
         id: `trip-${Date.now()}`,
-        name: payload.name || "New Trip",
+        name: payload.name || payload.title || "New Trip",
         destination: payload.destination || "Worldwide",
-        budget: payload.budget || 50000,
+        budget: payload.budget || payload.total_budget || 50000,
       };
     }
     const body = {
-      name: payload.name,
-      destination: payload.destination,
+      name: payload.name || payload.title || "New Trip",
+      title: payload.name || payload.title || "New Trip",
+      destination: payload.destination || "Worldwide",
       start_date: payload.start_date || payload.startDate,
       end_date: payload.end_date || payload.endDate,
       duration_days: payload.duration_days || 5,
-      budget: payload.budget || 0,
-      currency: payload.currency || "USD",
-      is_public: payload.is_public ?? false,
+      travelers: payload.travelers || 1,
+      budget: payload.budget || payload.total_budget || 50000,
+      currency: payload.currency || "INR",
+      cover_photo_url: payload.cover_photo_url || payload.cover_image_url || "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1200",
+      is_public: payload.is_public ?? true,
     };
     const res = await apiClient.post<Trip>('/trips', body);
     return res.data;
@@ -264,4 +276,16 @@ export const apiService = {
     const res = await apiClient.get<Trip>(`/sharing/${slug}`);
     return res.data;
   }
+};
+
+export const api = {
+  getTrips: apiService.getTrips,
+  getTrip: apiService.getTripById,
+  createTrip: apiService.createTrip,
+  updateTrip: apiService.updateTrip,
+  deleteTrip: apiService.deleteTrip,
+  searchCities: apiService.searchCities,
+  getSharedTrip: apiService.getSharedTrip,
+  planTrip: apiService.planTrip,
+  planAndSaveTrip: apiService.planAndSaveTrip
 };

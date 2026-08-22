@@ -1,6 +1,7 @@
 """
 Authentication endpoints for GlobeTrotter.
 POST /api/auth/signup
+POST /api/auth/register
 POST /api/auth/login
 POST /api/auth/forgot-password
 GET  /api/auth/me
